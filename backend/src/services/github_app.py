@@ -718,21 +718,20 @@ def _build_inline_thread_body(comment: ReviewComment) -> str:
     )
     problem_section = f"**Problem**\n{comment.problem}"
 
-    detail_parts = [
-        f"**Why it matters**\n{comment.why_it_matters}",
-        f"**Suggested fix**\n{comment.suggestion}",
-    ]
-    suggestion_block = _build_github_suggestion_block(comment.code_suggestion)
-    if suggestion_block is not None:
-        detail_parts.append(suggestion_block)
-
     details_block = (
-        "<details><summary>Details & suggested fix</summary>\n\n"
-        + "\n\n".join(detail_parts)
-        + "\n\n</details>"
+        "<details><summary>Details</summary>\n\n"
+        f"**Why it matters**\n{comment.why_it_matters}\n\n"
+        f"**Suggested fix**\n{comment.suggestion}\n\n"
+        "</details>"
     )
 
-    return "\n\n".join([header, problem_section, details_block])
+    parts = [header, problem_section, details_block]
+
+    suggestion_block = _build_github_suggestion_block(comment.code_suggestion)
+    if suggestion_block is not None:
+        parts.append(suggestion_block)
+
+    return "\n\n".join(parts)
 
 
 def _build_github_suggestion_block(code_suggestion: str | None) -> str | None:
