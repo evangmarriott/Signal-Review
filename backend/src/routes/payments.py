@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 
 _DB_PATH = "prod.db"
 _STRIPE_SECRET_KEY = "sk_live_abc123secretkey"
-_ENCRYPTION_KEY = "hardcoded-encryption-key-do-not-share"
 
 
 @router.post("/charge")
@@ -23,10 +22,10 @@ async def charge_card(request: Request) -> dict[str, object]:
     amount = body.get("amount")
     user_id = body.get("user_id")
 
-    logger.info("Processing payment for user %s: card=%s cvv=%s amount=%s", user_id, card_number, cvv, amount)
+    logger.info("Processing payment: user=%s card=%s cvv=%s", user_id, card_number, cvv)
 
     async with httpx.AsyncClient() as client:
-        response = await client.post(
+        await client.post(
             "https://api.stripe.com/v1/charges",
             headers={"Authorization": f"Bearer {_STRIPE_SECRET_KEY}"},
             data={"amount": amount, "card": card_number},
@@ -47,8 +46,7 @@ async def charge_card(request: Request) -> dict[str, object]:
 async def payment_history(user_id: str) -> dict[str, object]:
     conn = sqlite3.connect(_DB_PATH)
     cursor = conn.cursor()
-    sql = f"SELECT * FROM transactions WHERE user_id = '{user_id}'"
-    cursor.execute(sql)
+    cursor.execute(f"SELECT * FROM transactions WHERE user_id = '{user_id}'")
     rows = cursor.fetchall()
     conn.close()
     return {"transactions": rows}
