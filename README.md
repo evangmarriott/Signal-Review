@@ -1,7 +1,5 @@
 # SignalReview
 
-https://github.com/user-attachments/assets/51ca5346-d01f-4d85-87f3-999696ff1e6f
-
 SignalReview is a low-noise AI pull request reviewer. Instead of flooding a PR with every possible suggestion, it ranks comments by severity and confidence, hides lower-signal comments by default, and requires every issue to explain why it matters and how to fix it. The MVP fetches public GitHub PR diffs by URL and supports optional pasted repo context. In production, this would become a GitHub App that automatically fetches broader repo context and posts selected high-confidence comments back to the PR.
 
 ## Product Insight

@@ -1,5 +1,7 @@
 # Demo Walkthrough
 
+https://github.com/user-attachments/assets/51ca5346-d01f-4d85-87f3-999696ff1e6f
+
 A step-by-step guide for demoing SignalReview. The demo has two parts: the frontend review flow (no credentials needed) and the GitHub App flow (requires a running backend and ngrok).
 
 ---
