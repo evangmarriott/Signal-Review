@@ -304,6 +304,27 @@ def _build_mock_review(metadata: GitHubPRMetadata, *, demo_mode: bool) -> RawAIR
                 code_suggestion=None,
             ),
             ReviewComment(
+                title="No rate limiting on the profile endpoint",
+                file="routes/users.ts",
+                line=20,
+                category=ReviewCategory.LOGIC,
+                severity=ReviewSeverity.MEDIUM,
+                confidence=ReviewConfidence.MEDIUM,
+                problem=(
+                    "The new endpoint has no rate limiting. An attacker could enumerate user "
+                    "profiles at high speed once they have a valid session token."
+                ),
+                why_it_matters=(
+                    "Without rate limiting, a single compromised account can be used to scrape "
+                    "the entire user base."
+                ),
+                suggestion=(
+                    "Apply an existing rate-limit middleware to this route, or add a per-user "
+                    "request cap using a token bucket on the session ID."
+                ),
+                code_suggestion=None,
+            ),
+            ReviewComment(
                 title="Consider returning a narrowed user DTO",
                 file="routes/users.ts",
                 line=28,
