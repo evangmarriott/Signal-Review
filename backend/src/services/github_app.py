@@ -585,6 +585,10 @@ def _build_pull_request_review_event(result: PRReviewResult) -> str:
     return event_map[result.merge_recommendation]
 
 
+def _format_merge_recommendation(recommendation: str) -> str:
+    return recommendation.replace("_", " ").title()
+
+
 def _build_structured_review_body(
     *,
     result: PRReviewResult,
@@ -612,7 +616,7 @@ def _build_structured_review_body(
     sections = [
         "## SignalReview",
         (
-            f"**{result.merge_recommendation.replace('_', ' ').title()} · "
+            f"**{_format_merge_recommendation(result.merge_recommendation)} · "
             f"{result.overall_risk.title()} risk**"
         ),
         "",
@@ -845,7 +849,7 @@ def _build_check_run_output(
     )
     text = "\n".join(visible_lines) if visible_lines else "No visible comments."
     title = (
-        f"{result.merge_recommendation.replace('_', ' ').title()} · "
+        f"{_format_merge_recommendation(result.merge_recommendation)} · "
         f"{result.overall_risk.title()} risk"
     )
 
@@ -881,7 +885,7 @@ def _build_pr_review_comment_body(result: PRReviewResult) -> str:
     sections = [
         "## SignalReview",
         (
-            f"**{result.merge_recommendation.replace('_', ' ').title()} · "
+            f"**{_format_merge_recommendation(result.merge_recommendation)} · "
             f"{result.overall_risk.title()} risk**"
         ),
         "",

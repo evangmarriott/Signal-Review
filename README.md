@@ -35,6 +35,8 @@ Included:
 - GitHub PR diff fetching
 - GitHub App webhook intake for pull request events
 - GitHub Check Run publishing for GitHub App-triggered reviews
+- Inline PR review threads with diff-anchored comments
+- Fallback PR comment when inline thread anchoring is not possible
 - Optional manual repo context
 - Anthropic Claude integration
 - Mock demo fallback when `ANTHROPIC_API_KEY` is missing
@@ -49,7 +51,6 @@ Intentionally out of scope:
 
 - GitHub OAuth
 - Database-backed GitHub App installation management
-- Posting inline comments back to GitHub
 - Database or accounts
 - Full repo indexing
 - Complex deployment automation
@@ -63,8 +64,11 @@ backend/
     main.py
     routers/
       review.py
+      github_webhooks.py
     services/
       github.py
+      github_app.py
+      review_flow.py
       reviewer.py
       signal_filter.py
     models/
@@ -232,7 +236,7 @@ Create a GitHub App with:
 - Repository permissions:
   - `Checks: Read and write`
   - `Contents: Read-only`
-  - `Pull requests: Read-only`
+  - `Pull requests: Read and write`
 - Subscribe to events:
   - `Pull request`
 
