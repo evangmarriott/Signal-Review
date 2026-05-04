@@ -592,7 +592,7 @@ def _build_structured_review_body(
     summary_only_comments: list[ReviewComment],
 ) -> str:
     highlighted_titles = [
-        f"{index + 1}. {comment.title}"
+        f"{index + 1}. [{comment.severity.upper()}] {comment.title}"
         for index, comment in enumerate(result.visible_comments[:5])
     ]
     hidden_comment_lines = [
@@ -633,7 +633,16 @@ def _build_structured_review_body(
         sections.extend(["", "### Key Findings", *highlighted_titles])
 
     if summary_only_lines:
-        sections.extend(["", "### Summary-Only Findings", *summary_only_lines])
+        sections.extend(
+            [
+                "",
+                f"<details><summary>Summary-only findings ({len(summary_only_lines)})</summary>",
+                "",
+                "\n".join(summary_only_lines),
+                "",
+                "</details>",
+            ]
+        )
 
     if hidden_comment_lines:
         sections.extend(
@@ -702,25 +711,28 @@ def _build_structured_review_thread(
 
 
 def _build_inline_thread_body(comment: ReviewComment) -> str:
-    sections = [
-        (
-            f"**{comment.title}**\n\n"
-            f"{comment.severity.title()} severity · {comment.category.title()} · "
-            f"{comment.confidence.title()} confidence"
-        ),
-        f"**Problem**\n{comment.problem}",
+    header = (
+        f"**{comment.title}**\n\n"
+        f"{comment.severity.title()} severity · {comment.category.title()} · "
+        f"{comment.confidence.title()} confidence"
+    )
+    problem_section = f"**Problem**\n{comment.problem}"
+
+    detail_parts = [
         f"**Why it matters**\n{comment.why_it_matters}",
         f"**Suggested fix**\n{comment.suggestion}",
     ]
     suggestion_block = _build_github_suggestion_block(comment.code_suggestion)
     if suggestion_block is not None:
-        sections.extend(
-            [
-                "**Apply suggested change in GitHub**",
-                suggestion_block,
-            ]
-        )
-    return "\n\n".join(sections)
+        detail_parts.append(suggestion_block)
+
+    details_block = (
+        "<details><summary>Details & suggested fix</summary>\n\n"
+        + "\n\n".join(detail_parts)
+        + "\n\n</details>"
+    )
+
+    return "\n\n".join([header, problem_section, details_block])
 
 
 def _build_github_suggestion_block(code_suggestion: str | None) -> str | None:
@@ -932,8 +944,11 @@ def _build_comment_markdown(comment: ReviewComment, *, index: int) -> str:
         if comment.file is not None
         else "Unknown location"
     )
-    parts = [
-        f"#### {index}. {comment.title}",
+    summary_line = (
+        f"{index}. **{comment.title}** "
+        f"— {comment.severity} · {comment.category} · {location}"
+    )
+    inner_parts = [
         (
             f"- Severity: **{comment.severity}**\n"
             f"- Confidence: **{comment.confidence}**\n"
@@ -945,8 +960,13 @@ def _build_comment_markdown(comment: ReviewComment, *, index: int) -> str:
         f"**Suggested fix**\n{comment.suggestion}",
     ]
     if comment.code_suggestion is not None:
-        parts.append(f"```text\n{comment.code_suggestion}\n```")
-    return "\n\n".join(parts)
+        inner_parts.append(f"```text\n{comment.code_suggestion}\n```")
+    inner = "\n\n".join(inner_parts)
+    return (
+        f"<details><summary>{summary_line}</summary>\n\n"
+        f"{inner}\n\n"
+        f"</details>"
+    )
 
 
 def _parse_json_response(response: httpx.Response, *, resource_name: str) -> object:
