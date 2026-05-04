@@ -141,7 +141,7 @@ def test_build_structured_review_draft_creates_inline_threads_and_summary_fallba
     assert draft.inline_threads[0].line == 302
     assert draft.inline_threads[0].side == "RIGHT"
     assert "See the inline SignalReview threads in **Files changed**" in draft.body
-    assert "### Summary-Only Findings" in draft.body
+    assert "Summary-only findings" in draft.body
     assert "Follow up on fallback logging" in draft.body
 
 
@@ -178,7 +178,7 @@ def test_build_structured_review_draft_uses_summary_only_when_patch_missing() ->
     draft = _build_structured_review_draft(result=_review_result(), changed_files=changed_files)
 
     assert draft.inline_threads == []
-    assert "### Summary-Only Findings" in draft.body
+    assert "Summary-only findings" in draft.body
     assert "Add coverage for malformed GitHub responses" in draft.body
 
 
@@ -235,7 +235,7 @@ def test_build_structured_review_draft_handles_mixed_inline_and_summary_comments
     assert len(draft.inline_threads) == 1
     assert draft.inline_threads[0].path == "backend/src/services/github_app.py"
     assert "Line anchor missing from malformed patch" in draft.body
-    assert "### Summary-Only Findings" in draft.body
+    assert "Summary-only findings" in draft.body
 
 
 @pytest.mark.asyncio
